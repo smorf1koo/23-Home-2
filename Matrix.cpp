@@ -2,23 +2,28 @@
 
 using namespace std;
 
-Matrix::Matrix(unsigned int _rows, unsigned int _cols)
+template<typename T>
+Matrix<T>::Matrix(unsigned int _rows, unsigned int _cols)
         :rows(_rows), cols(_cols){
-    arr = new double*[rows];
-    for (int i=0; i < rows; i++) arr[i] = new double[cols];
+    arr = new T*[rows];
+    for (int i=0; i < rows; i++) arr[i] = new T[cols];
 }
 
-Matrix::Matrix() : cols(0), rows(0){
-    arr = new double*[rows];
-    for (int i=0; i < rows; i++) arr[i] = new double[cols];
+template<typename T>
+Matrix<T>::Matrix() : cols(0), rows(0){
+    arr = new T*[rows];
+    for (int i=0; i < rows; i++) arr[i] = new T[cols];
 }
 
-Matrix::Matrix(const Matrix &other) : cols(other.cols), rows(other.rows), arr(other.arr){}
+template<typename T>
+Matrix<T>::Matrix(const Matrix &other) : cols(other.cols), rows(other.rows), arr(other.arr){}
 
-Matrix::~Matrix(){for (int i=0; i < rows; i++) delete [] arr[i];}
+template<typename T>
+Matrix<T>::~Matrix(){for (int i=0; i < rows; i++) delete [] arr[i];}
 
 // ввод матрицы из консоли
-void Matrix::inputMatrix() {
+template<typename T>
+void Matrix<T>::inputMatrix() {
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
             printf("Enter element at position [%i][%i]\n", i+1, j+1);
@@ -28,7 +33,8 @@ void Matrix::inputMatrix() {
 }
 
 // воод матрицы из файла
-void Matrix::inputMatrix(const string& path) {
+template<typename T>
+void Matrix<T>::inputMatrix(const string& path) {
     ifstream file(path);
     if (!file.is_open()){
         cerr << "File does not open to input\n";
@@ -46,7 +52,8 @@ void Matrix::inputMatrix(const string& path) {
 }
 
 // вывод матрицы в консоль
-void Matrix::outputMatrix() {
+template<typename T>
+void Matrix<T>::outputMatrix() {
     cout << "Your Matrix: " << "\n";
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
@@ -57,7 +64,8 @@ void Matrix::outputMatrix() {
 }
 
 // вывод матрицы в файл
-void Matrix::outputMatrix(const string& path) {
+template<typename T>
+void Matrix<T>::outputMatrix(const string& path) {
     fstream file(path);
     if (!file.is_open()){
         cerr << "File does not open to output\n";
@@ -74,8 +82,9 @@ void Matrix::outputMatrix(const string& path) {
 }
 
 // элементарное преобразование 1 (смена строк местами)
-void Matrix::elemTransformation_1() {
-    int a, b;
+template<typename T>
+void Matrix<T>::elemTransformation_1() {
+    unsigned int a, b;
     cout << "Enter line numbers (a b)\n";
     cin >> a >> b;
     if ((a > rows)||(b > cols)){
@@ -89,9 +98,10 @@ void Matrix::elemTransformation_1() {
 }
 
 // элеметраное преобразование 2 (умножение на значение отличное от 0)
-void Matrix::elemTransformation_2() {
-    int a;
-    double c;
+template<typename T>
+void Matrix<T>::elemTransformation_2() {
+    unsigned int a;
+    T c;
     cout << "Enter line number and value != 0 \n";
     cin >> a >> c;
     if ((a > rows)||(c == 0)){
@@ -103,9 +113,10 @@ void Matrix::elemTransformation_2() {
 }
 
 // элеметраное преобразование 3 (сложение строки на строку, умноженную на значение отличное от 0)
-void Matrix::elemTransformation_3() {
-    int a, b;
-    double c;
+template<typename T>
+void Matrix<T>::elemTransformation_3() {
+    unsigned int a, b;
+    T c;
     cout << "Enter line numbers and value != 0 \n";
     cin >> a >> b >> c;
     if ((a > rows)||(b > cols)||(c == 0)){
@@ -117,7 +128,8 @@ void Matrix::elemTransformation_3() {
 }
 
 // + сложение матриц
-Matrix Matrix::operator+(const Matrix& A) {
+template<typename T>
+Matrix<T> Matrix<T>::operator+(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
         cerr << "Different matrix dimensions\n";
         exit(1);
@@ -132,7 +144,8 @@ Matrix Matrix::operator+(const Matrix& A) {
 }
 
 // - разница матриц
-Matrix Matrix::operator-(const Matrix& A) {
+template<typename T>
+Matrix<T> Matrix<T>::operator-(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
         cerr << "Different matrix dimensions\n";
         exit(1);
@@ -146,7 +159,8 @@ Matrix Matrix::operator-(const Matrix& A) {
     return C;
 }
 // * умножение матрицы на скаляр
-void Matrix::operator*(const double c) {
+template<typename T>
+void Matrix<T>::operator*(const T c) {
     if (c == 0){
         cerr << "Zeroing\n";
     }
@@ -158,7 +172,8 @@ void Matrix::operator*(const double c) {
 }
 
 // * перемножение матриц
-Matrix Matrix::operator*(const Matrix& A) {
+template<typename T>
+Matrix<T> Matrix<T>::operator*(const Matrix& A) {
     unsigned int rows1, cols1, rows2, cols2;
     rows1 = rows, cols1 = cols, rows2 = A.rows, cols2 = A.cols;
     if (cols1 != rows2){
@@ -178,7 +193,8 @@ Matrix Matrix::operator*(const Matrix& A) {
 }
 
 // == проверка равенства матриц
-bool Matrix::operator==(const Matrix& A) {
+template<typename T>
+bool Matrix<T>::operator==(const Matrix& A) {
     if ((A.rows != rows)||(A.cols != cols)){
         cerr << "Different matrix dimensions\n";
         exit(1); // можно прописать return false;
@@ -194,7 +210,8 @@ bool Matrix::operator==(const Matrix& A) {
 }
 
 // == проверка равенства матрицы и скаляра
-bool Matrix::operator==(const double c) {
+template<typename T>
+bool Matrix<T>::operator==(const T c) {
     if (!isCube()){
         cerr << "Matrix should be a square\n";
         exit(1); // можно прописать return false;
@@ -208,22 +225,26 @@ bool Matrix::operator==(const double c) {
 }
 
 // != проверка неравенства матриц
-bool Matrix::operator!=(const Matrix& A) {
+template<typename T>
+bool Matrix<T>::operator!=(const Matrix& A) {
     return !(*this==A);
 }
 
 // !- проверка неравенства матрицы и скаляра
-bool Matrix::operator!=(const double c) {
+template<typename T>
+bool Matrix<T>::operator!=(const T c) {
     return !(*this == c);
 }
 
 // является ли матрица кмадратной
-bool Matrix::isCube() const {
+template<typename T>
+bool Matrix<T>::isCube() const {
     return cols*cols == cols*rows;
 }
 
 // вычисление определителя
-double Matrix::determinant(){
+template<typename T>
+double Matrix<T>::determinant(){
     if (!isCube()){
         cerr << "Matrix must be square\n";
         exit(1);
@@ -236,7 +257,8 @@ double Matrix::determinant(){
 }
 
 // вычисление минора
-double Matrix::minor(int row, int col){ // вычеркнутые строка и колонка
+template<typename T>
+double Matrix<T>::minor(int row, int col){ // вычеркнутые строка и колонка
     Matrix A(rows-1, cols-1);
     int A_i = 0; // индекс строки minor
     for (int i=0; i < rows; i++){
@@ -259,7 +281,8 @@ double Matrix::minor(int row, int col){ // вычеркнутые строка �
 }
 
 // транспонирование матрицы
-Matrix Matrix::transposed() {
+template<typename T>
+Matrix<T> Matrix<T>::transposed() {
     if (!isCube()){
         cerr << "Matrix must be square\n";
         exit(1);
@@ -274,7 +297,8 @@ Matrix Matrix::transposed() {
 }
 
 // поиск обратной матрицы
-Matrix Matrix::operator!(){
+template<typename T>
+Matrix<T> Matrix<T>::operator!(){
     double det = determinant();
     if (det == 0) {
         cerr << "Determinant = 0\n";
