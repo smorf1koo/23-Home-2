@@ -2,6 +2,7 @@
 #include<fstream>
 #include <string>
 #include "Matrix.h"
+#include "Matrix.cpp"
 using namespace std;
 
 int main(){
@@ -15,50 +16,50 @@ int main(){
     A.inverse();
     A.elemTransformation_3();
     A.inverse();
-//    cout << "before elemTransformation\n";
-//    A.elemTransformation_1();
-//    A.outputMatrix();
-//    A.elemTransformation_2();
-//    A.outputMatrix();
-//    A.elemTransformation_3();
-//    A.outputMatrix();
-//    cout << "after elemTransformation\n";
-//
-//    unsigned int rows1, cols1;
-//    cout << "Enter B_matrix size (n m)\n";
-//    cin >> rows1 >> cols1;
-//    Matrix B(rows1, cols1);
-//    B.inputMatrix();
-//    B.outputMatrix();
-//
-//    Matrix C = A+B;
-//    cout << "Matrix A + Matrix B\n";
-//    C.outputMatrix();
-//
-//    Matrix D = A-B;
-//    cout << "Matrix A - Matrix B\n";
-//    D.outputMatrix();
-//
-//    Matrix E = A*B;
-//    cout << "Matrix A * Matrix B\n";
-//    E.outputMatrix();
-//
-//    int c;
-//    cout << "Enter c\n";
-//    cin >> c;
-//    A*c;
-//    A.outputMatrix();
-//
-//    unsigned int rows2, cols2;
-//    cout << "Enter F_matrix size (n m)\n";
-//    cin >> rows2 >> cols2;
-//    Matrix F(rows, cols);
-//    F.inputMatrix();
-//    cout << (F==c) << ' ' << (F!=c) << ' ' << (F==A) << ' ' << (F!=A) <<'\n';
-//
-//    cout << A.determinant() << '\n';
-//    Matrix H = A.inverse();
-//    H.outputMatrix();
+    cout << "before elemTransformation\n";
+    A.elemTransformation_1();
+    A.outputMatrix();
+    A.elemTransformation_2();
+    A.outputMatrix();
+    A.elemTransformation_3();
+    A.outputMatrix();
+    cout << "after elemTransformation\n";
+
+    unsigned int rows1, cols1;
+    cout << "Enter B_matrix size (n m)\n";
+    cin >> rows1 >> cols1;
+    Matrix B(rows1, cols1);
+    B.inputMatrix();
+    B.outputMatrix();
+
+    Matrix C = A+B;
+    cout << "Matrix A + Matrix B\n";
+    C.outputMatrix();
+
+    Matrix D = A-B;
+    cout << "Matrix A - Matrix B\n";
+    D.outputMatrix();
+
+    Matrix E = A*B;
+    cout << "Matrix A * Matrix B\n";
+    E.outputMatrix();
+
+    int c;
+    cout << "Enter c\n";
+    cin >> c;
+    A*c;
+    A.outputMatrix();
+
+    unsigned int rows2, cols2;
+    cout << "Enter F_matrix size (n m)\n";
+    cin >> rows2 >> cols2;
+    Matrix F(rows, cols);
+    F.inputMatrix();
+    cout << (F==c) << ' ' << (F!=c) << ' ' << (F==A) << ' ' << (F!=A) <<'\n';
+
+    cout << A.determinant() << '\n';
+    Matrix H = A.inverse();
+    H.outputMatrix();
 
 //    ввод/вывод из файла
 //    unsigned int rows, cols;
