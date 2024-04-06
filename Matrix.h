@@ -32,7 +32,7 @@ public:
     double determinant();
     double minor(int, int);
     Matrix transposed();
-    Matrix inverse();
+    Matrix operator!();
     ~Matrix();
 };
 

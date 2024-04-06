@@ -13,13 +13,11 @@ Matrix::Matrix() : cols(0), rows(0){
     for (int i=0; i < rows; i++) arr[i] = new double[cols];
 }
 
-Matrix::Matrix(const Matrix &other) : cols(other.cols), rows(other.rows){
-    arr = new double*[rows];
-    for (int i=0; i < rows; i++) arr[i] = new double[cols];
-}
+Matrix::Matrix(const Matrix &other) : cols(other.cols), rows(other.rows), arr(other.arr){}
 
 Matrix::~Matrix(){for (int i=0; i < rows; i++) delete [] arr[i];}
 
+// ввод матрицы из консоли
 void Matrix::inputMatrix() {
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
@@ -29,6 +27,7 @@ void Matrix::inputMatrix() {
     }
 }
 
+// воод матрицы из файла
 void Matrix::inputMatrix(const string& path) {
     ifstream file(path);
     if (!file.is_open()){
@@ -46,6 +45,7 @@ void Matrix::inputMatrix(const string& path) {
     file.close();
 }
 
+// вывод матрицы в консоль
 void Matrix::outputMatrix() {
     cout << "Your Matrix: " << "\n";
     for (int i = 0; i < rows; i++){
@@ -56,6 +56,7 @@ void Matrix::outputMatrix() {
     }
 }
 
+// вывод матрицы в файл
 void Matrix::outputMatrix(const string& path) {
     fstream file(path);
     if (!file.is_open()){
@@ -72,7 +73,7 @@ void Matrix::outputMatrix(const string& path) {
     file.close();
 }
 
-
+// элементарное преобразование 1 (смена строк местами)
 void Matrix::elemTransformation_1() {
     int a, b;
     cout << "Enter line numbers (a b)\n";
@@ -87,6 +88,7 @@ void Matrix::elemTransformation_1() {
     }
 }
 
+// элеметраное преобразование 2 (умножение на значение отличное от 0)
 void Matrix::elemTransformation_2() {
     int a;
     double c;
@@ -100,6 +102,7 @@ void Matrix::elemTransformation_2() {
     for (int j=0; j < cols; j++) arr[a][j]*=c;
 }
 
+// элеметраное преобразование 3 (сложение строки на строку, умноженную на значение отличное от 0)
 void Matrix::elemTransformation_3() {
     int a, b;
     double c;
@@ -110,9 +113,10 @@ void Matrix::elemTransformation_3() {
         exit(1);
     }
     a--, b--;
-    for (int j=0; j < cols; j++) arr[a][j] += arr[b][j]*c;
+    for (int j=0; j < cols; j++) arr[b][j] += arr[a][j]*c;
 }
 
+// + сложение матриц
 Matrix Matrix::operator+(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
         cerr << "Different matrix dimensions\n";
@@ -127,6 +131,7 @@ Matrix Matrix::operator+(const Matrix& A) {
     return C;
 }
 
+// - разница матриц
 Matrix Matrix::operator-(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
         cerr << "Different matrix dimensions\n";
@@ -140,7 +145,7 @@ Matrix Matrix::operator-(const Matrix& A) {
     }
     return C;
 }
-
+// * умножение матрицы на скаляр
 void Matrix::operator*(const double c) {
     if (c == 0){
         cerr << "Zeroing\n";
@@ -152,6 +157,7 @@ void Matrix::operator*(const double c) {
     }
 }
 
+// * перемножение матриц
 Matrix Matrix::operator*(const Matrix& A) {
     unsigned int rows1, cols1, rows2, cols2;
     rows1 = rows, cols1 = cols, rows2 = A.rows, cols2 = A.cols;
@@ -171,6 +177,7 @@ Matrix Matrix::operator*(const Matrix& A) {
     return C;
 }
 
+// == проверка равенства матриц
 bool Matrix::operator==(const Matrix& A) {
     if ((A.rows != rows)||(A.cols != cols)){
         cerr << "Different matrix dimensions\n";
@@ -186,6 +193,7 @@ bool Matrix::operator==(const Matrix& A) {
     return true;
 }
 
+// == проверка равенства матрицы и скаляра
 bool Matrix::operator==(const double c) {
     if (!isCube()){
         cerr << "Matrix should be a square\n";
@@ -199,19 +207,23 @@ bool Matrix::operator==(const double c) {
     return true;
 }
 
+// != проверка неравенства матриц
 bool Matrix::operator!=(const Matrix& A) {
     return !(*this==A);
 }
 
+// !- проверка неравенства матрицы и скаляра
 bool Matrix::operator!=(const double c) {
     return !(*this == c);
 }
 
+// является ли матрица кмадратной
 bool Matrix::isCube() const {
     return cols*cols == cols*rows;
 }
 
-double Matrix::determinant() {
+// вычисление определителя
+double Matrix::determinant(){
     if (!isCube()){
         cerr << "Matrix must be square\n";
         exit(1);
@@ -223,7 +235,8 @@ double Matrix::determinant() {
     return det;
 }
 
-double Matrix::minor(int row, int col) {
+// вычисление минора
+double Matrix::minor(int row, int col){ // вычеркнутые строка и колонка
     Matrix A(rows-1, cols-1);
     int A_i = 0; // индекс строки minor
     for (int i=0; i < rows; i++){
@@ -236,7 +249,7 @@ double Matrix::minor(int row, int col) {
         }
         A_i++;
     }
-//        A.outputMatrix();
+
     // знак минора
     int sign;
     if ((col+row)%2 == 0) sign = 1;
@@ -245,6 +258,7 @@ double Matrix::minor(int row, int col) {
     return sign * A.determinant();
 }
 
+// транспонирование матрицы
 Matrix Matrix::transposed() {
     if (!isCube()){
         cerr << "Matrix must be square\n";
@@ -259,7 +273,8 @@ Matrix Matrix::transposed() {
     return A;
 }
 
-Matrix Matrix::inverse() {
+// поиск обратной матрицы
+Matrix Matrix::operator!(){
     double det = determinant();
     if (det == 0) {
         cerr << "Determinant = 0\n";
@@ -275,8 +290,6 @@ Matrix Matrix::inverse() {
             A.arr[i][j] = minor(j,i); // составляем матрицу миноров
         }
     }
-    cout << "Matrix\n";
-    A.outputMatrix();
     A.transposed();
     A*(1/det);
     return A;
