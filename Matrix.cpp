@@ -199,7 +199,7 @@ Matrix<T> Matrix<T>::operator-(const Matrix& A) {
 }
 // * умножение матрицы на скаляр
 template<typename T>
-void Matrix<T>::operator*(const T c) {
+Matrix<T> Matrix<T>::operator*(const T c) {
     if (c == 0){
         throw invalid_argument("Zeroing\n");
     }
@@ -209,6 +209,7 @@ void Matrix<T>::operator*(const T c) {
             C.arr[i][j] = c*arr[i][j];
         }
     }
+    return C;
 }
 
 // * перемножение матриц

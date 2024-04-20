@@ -31,7 +31,7 @@ public:
     Matrix operator+(const Matrix&);
     Matrix operator-(const Matrix&);
     Matrix operator*(const Matrix&);
-    void operator*(T);
+    Matrix operator*(T);
 
     bool operator==(const Matrix&);
     bool operator==(T);
