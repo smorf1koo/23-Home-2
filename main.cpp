@@ -7,9 +7,13 @@
 using namespace std;
 
 int main(){
-    Matrix<int> M(3, 3);
+    Matrix<int> M;
     cin >> M;
     cout << M;
+
+    Matrix<double> K(2, 2);
+    cin >> K;
+    cout << K;
 
     Matrix<int> Z = Matrix<int>::zero(4);
     cout << Z;

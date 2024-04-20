@@ -18,6 +18,12 @@ Matrix<T>::~Matrix(){arr.clear();}
 // ввод матрицы из консоли
 template<typename T>
 void Matrix<T>::inputMatrix() {
+    if ((rows == 0) && (cols == 0)){
+        printf("Yor matrix is empty. Enter rows and cols");
+        cin >> rows >> cols;
+        if ((rows <= 0) or (cols <= 0)) throw invalid_argument("Arguments must be > 0");
+        arr.resize(rows, vector<T>(cols));
+    }
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
             printf("Enter element at position [%i][%i]\n", i+1, j+1);
@@ -26,24 +32,43 @@ void Matrix<T>::inputMatrix() {
     }
 }
 
-// вод матрицы из файла
+// ввод матрицы из файла
 template<typename T>
 void Matrix<T>::inputMatrix(const string& path) {
     ifstream file(path);
     if (!file.is_open()){
-        cerr << "File does not open to input\n";
-        exit(1);
+        throw invalid_argument("File does not open to input\n");
     }
     file.ignore(100,'\n'); // типа мы игнорируем первые 100 символов до '\n'
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
-            double elem;
+            T elem;
             file >> elem;
             arr[i][j] = elem;
         }
     }
     file.close();
 }
+
+
+//перегрузка опреатора ввода матрицы в поток
+template<typename T>
+std::istream &operator>>(std::istream &is, Matrix<T>& A) {
+    if ((A.rows == 0) && (A.cols == 0)){
+        printf("Yor matrix is empty. Enter rows and cols: ");
+        is >> A.rows >> A.cols;
+        if ((A.rows <= 0) or (A.cols <= 0)) throw invalid_argument("Arguments must be > 0");
+        A.arr.resize(A.rows, vector<T>(A.cols));
+    }
+    for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+            printf("Enter element at position [%i][%i]\n", i+1, j+1);
+            is >> A.arr[i][j];
+        }
+    }
+    return is;
+}
+
 
 // вывод матрицы в консоль
 template<typename T>
@@ -62,8 +87,7 @@ template<typename T>
 void Matrix<T>::outputMatrix(const string& path) {
     fstream file(path);
     if (!file.is_open()){
-        cerr << "File does not open to output\n";
-        exit(1);
+        throw invalid_argument("File does not open to output\n");
     }
     file << rows << ' ' << cols << '\n';
     for (int i = 0; i < rows; i++){
@@ -75,6 +99,20 @@ void Matrix<T>::outputMatrix(const string& path) {
     file.close();
 }
 
+
+//перегрузка опреатора вывода матрицы в поток
+template<typename T>
+std::ostream &operator<<(std::ostream &os, const Matrix<T>& A) {
+    os << "Your Matrix: " << "\n";
+    for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+            os << A.arr[i][j] << " ";
+        }
+        os << '\n';
+    }
+    return os;
+}
+
 // элементарное преобразование 1 (смена строк местами)
 template<typename T>
 void Matrix<T>::elemTransformation_1() {
@@ -82,8 +120,7 @@ void Matrix<T>::elemTransformation_1() {
     cout << "Enter line numbers (a b)\n";
     cin >> a >> b;
     if ((a > rows)||(b > cols)){
-        cerr << "Input error (a > rows) or (b > cols)\n";
-        exit(1);
+        throw invalid_argument("Input error (a > rows) or (b > cols)\n");
     }
     a--, b--;
     for (int j=0; j < cols; j++){
@@ -99,8 +136,7 @@ void Matrix<T>::elemTransformation_2() {
     cout << "Enter line number and value != 0 \n";
     cin >> a >> c;
     if ((a > rows)||(c == 0)){
-        cerr << "Input error (a > rows) or (c == 0)\n";
-        exit(1);
+        throw invalid_argument("Input error (a > rows) or (c == 0)\n");
     }
     a--;
     for (int j=0; j < cols; j++) arr[a][j]*=c;
@@ -114,8 +150,7 @@ void Matrix<T>::elemTransformation_3() {
     cout << "Enter line numbers and value != 0 \n";
     cin >> a >> b >> c;
     if ((a > rows)||(b > cols)||(c == 0)){
-        cerr << "Input error (a > rows) or (b > cols) or (c==0)\n";
-        exit(1);
+        throw invalid_argument("Input error (a > rows) or (b > cols) or (c==0)\n");
     }
     a--, b--;
     for (int j=0; j < cols; j++) arr[b][j] += arr[a][j]*c;
@@ -125,8 +160,7 @@ void Matrix<T>::elemTransformation_3() {
 template<typename T>
 Matrix<T> & Matrix<T>::operator=(const Matrix &A){
     if (this == &A){
-        cerr << "Self-appropriation\n";
-        exit(1);
+        throw invalid_argument("Self-appropriation\n");
     }
     rows = A.rows;
     cols = A.cols;
@@ -138,8 +172,7 @@ Matrix<T> & Matrix<T>::operator=(const Matrix &A){
 template<typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
-        cerr << "Different matrix dimensions\n";
-        exit(1);
+        throw invalid_argument("Different matrix dimensions\n");
     }
     Matrix<T> C(rows, cols);
     for (int i=0; i < C.rows; i++){
@@ -154,8 +187,7 @@ Matrix<T> Matrix<T>::operator+(const Matrix& A) {
 template<typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix& A) {
     if ((cols != A.cols)||(rows != A.rows)){
-        cerr << "Different matrix dimensions\n";
-        exit(1);
+        throw invalid_argument("Different matrix dimensions\n");
     }
     Matrix<T> C(rows, cols);
     for (int i=0; i < C.rows; i++){
@@ -169,11 +201,12 @@ Matrix<T> Matrix<T>::operator-(const Matrix& A) {
 template<typename T>
 void Matrix<T>::operator*(const T c) {
     if (c == 0){
-        cerr << "Zeroing\n";
+        throw invalid_argument("Zeroing\n");
     }
+    Matrix<T> C(rows, cols);
     for (int i=0; i < rows; i++){
         for (int j=0; j < cols; j++){
-            arr[i][j] *= c;
+            C.arr[i][j] = c*arr[i][j];
         }
     }
 }
@@ -184,8 +217,7 @@ Matrix<T> Matrix<T>::operator*(const Matrix& A) {
     unsigned int rows1, cols1, rows2, cols2;
     rows1 = rows, cols1 = cols, rows2 = A.rows, cols2 = A.cols;
     if (cols1 != rows2){
-        cerr << "Different matrix dimensions\n";
-        exit(1);
+        throw invalid_argument("Different matrix dimensions\n");
     }
     Matrix<T> C(rows1, cols2);
 
@@ -203,8 +235,7 @@ Matrix<T> Matrix<T>::operator*(const Matrix& A) {
 template<typename T>
 bool Matrix<T>::operator==(const Matrix& A) {
     if ((A.rows != rows)||(A.cols != cols)){
-        cerr << "Different matrix dimensions\n";
-        exit(1); // можно прописать return false;
+        return false;
     }
     for (int i = 0; i < rows; i++){
         for (int j=0; j < cols; j++){
@@ -220,12 +251,11 @@ bool Matrix<T>::operator==(const Matrix& A) {
 template<typename T>
 bool Matrix<T>::operator==(const T c) {
     if (!isCube()){
-        cerr << "Matrix should be a square\n";
-        exit(1); // можно прописать return false;
+        return false;
     }
     for (int i=0; i < rows; i++){
         for (int j=0; j < cols; j++){
-            if ((arr[i][j] != c) & (i == j)||(arr[i][j] != 0)&(i != j)) return false;
+            if ((arr[i][j] != c) & (i == j)||(arr[i][j] != 0)&&(i != j)) return false;
         }
     }
     return true;
@@ -253,8 +283,7 @@ bool Matrix<T>::isCube() const {
 template<typename T>
 double Matrix<T>::determinant(){
     if (!isCube()){
-        cerr << "Matrix must be square\n";
-        exit(1);
+        throw invalid_argument("Matrix must be square\n");
     }
     if (cols == 1) return arr[0][0];
     if (cols == 2) return arr[0][0]*arr[1][1] - arr[0][1]*arr[1][0];
@@ -291,8 +320,7 @@ double Matrix<T>::minor(int row, int col){ // вычеркнутые строк�
 template<typename T>
 Matrix<T> Matrix<T>::transposed() {
     if (!isCube()){
-        cerr << "Matrix must be square\n";
-        exit(1);
+        throw invalid_argument("Matrix must be square\n");
     }
     Matrix<T> A(rows, cols);
     for (int i=0; i < rows; i++){
@@ -308,13 +336,11 @@ template<typename T>
 Matrix<T> Matrix<T>::operator!(){
     double det = determinant();
     if (det == 0) {
-        cerr << "Determinant = 0\n";
-        exit(1);
+        throw invalid_argument("Determinant = 0\n");
     }
     Matrix<double> A(rows, cols);
     if (!isCube()) {
-        cerr << "Matrix must be square\n";
-        exit(1);
+        throw invalid_argument("Matrix must be square\n");
     }
     for (int i=0; i<rows;i++){
         for (int j=0;j<cols;j++){
@@ -324,29 +350,4 @@ Matrix<T> Matrix<T>::operator!(){
     A.transposed();
     A*(1/det);
     return A;
-}
-
-//перегрузка опреатора вывода матрицы в поток
-template<typename T>
-std::ostream &operator<<(std::ostream &os, const Matrix<T>& A) {
-    os << "Your Matrix: " << "\n";
-    for (int i = 0; i < A.rows; i++) {
-        for (int j = 0; j < A.cols; j++) {
-            os << A.arr[i][j] << " ";
-        }
-        os << '\n';
-    }
-    return os;
-}
-
-//перегрузка опреатора ввода матрицы в поток
-template<typename T>
-std::istream &operator>>(std::istream &is, Matrix<T>& A) {
-    for (int i = 0; i < A.rows; i++) {
-        for (int j = 0; j < A.cols; j++) {
-            printf("Enter element at position [%i][%i]\n", i+1, j+1);
-            is >> A.arr[i][j];
-        }
-    }
-    return is;
 }
