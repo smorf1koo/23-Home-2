@@ -4,22 +4,16 @@ using namespace std;
 
 template<typename T>
 Matrix<T>::Matrix(unsigned int _rows, unsigned int _cols)
-        :rows(_rows), cols(_cols){
-    arr = new T*[rows];
-    for (int i=0; i < rows; i++) arr[i] = new T[cols];
-}
+        :rows(_rows), cols(_cols), arr(vector<vector<T>>(_rows, vector<T>(_cols))){}
 
 template<typename T>
-Matrix<T>::Matrix() : cols(0), rows(0){
-    arr = new T*[rows];
-    for (int i=0; i < rows; i++) arr[i] = new T[cols];
-}
+Matrix<T>::Matrix() : cols(0), rows(0), arr(){}
 
 template<typename T>
 Matrix<T>::Matrix(const Matrix &other) : cols(other.cols), rows(other.rows), arr(other.arr){}
 
 template<typename T>
-Matrix<T>::~Matrix(){for (int i=0; i < rows; i++) delete [] arr[i];}
+Matrix<T>::~Matrix(){arr.clear();}
 
 // ввод матрицы из консоли
 template<typename T>
@@ -32,7 +26,7 @@ void Matrix<T>::inputMatrix() {
     }
 }
 
-// воод матрицы из файла
+// вод матрицы из файла
 template<typename T>
 void Matrix<T>::inputMatrix(const string& path) {
     ifstream file(path);
@@ -127,6 +121,19 @@ void Matrix<T>::elemTransformation_3() {
     for (int j=0; j < cols; j++) arr[b][j] += arr[a][j]*c;
 }
 
+//оператор присваивания
+template<typename T>
+Matrix<T> & Matrix<T>::operator=(const Matrix &A){
+    if (this == &A){
+        cerr << "Self-appropriation\n";
+        exit(1);
+    }
+    rows = A.rows;
+    cols = A.cols;
+    for (int i = 0; i < rows; i++) arr[i] = A.arr[i];
+    return *this;
+}
+
 // + сложение матриц
 template<typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix& A) {
@@ -134,7 +141,7 @@ Matrix<T> Matrix<T>::operator+(const Matrix& A) {
         cerr << "Different matrix dimensions\n";
         exit(1);
     }
-    Matrix C(rows, cols);
+    Matrix<T> C(rows, cols);
     for (int i=0; i < C.rows; i++){
         for (int j=0; j < C.cols; j++){
             C.arr[i][j] = arr[i][j] + A.arr[i][j];
@@ -150,7 +157,7 @@ Matrix<T> Matrix<T>::operator-(const Matrix& A) {
         cerr << "Different matrix dimensions\n";
         exit(1);
     }
-    Matrix C(rows, cols);
+    Matrix<T> C(rows, cols);
     for (int i=0; i < C.rows; i++){
         for (int j=0; j < C.cols; j++){
             C.arr[i][j] = arr[i][j] - A.arr[i][j];
@@ -180,7 +187,7 @@ Matrix<T> Matrix<T>::operator*(const Matrix& A) {
         cerr << "Different matrix dimensions\n";
         exit(1);
     }
-    Matrix C(rows1, cols2);
+    Matrix<T> C(rows1, cols2);
 
     for (int i=0; i < rows1; i++){
         for (int j=0; j < cols2; j++){
@@ -259,7 +266,7 @@ double Matrix<T>::determinant(){
 // вычисление минора
 template<typename T>
 double Matrix<T>::minor(int row, int col){ // вычеркнутые строка и колонка
-    Matrix A(rows-1, cols-1);
+    Matrix<T> A(rows-1, cols-1);
     int A_i = 0; // индекс строки minor
     for (int i=0; i < rows; i++){
         if (i == row) continue; // пропустит строку row
@@ -287,7 +294,7 @@ Matrix<T> Matrix<T>::transposed() {
         cerr << "Matrix must be square\n";
         exit(1);
     }
-    Matrix A(rows, cols);
+    Matrix<T> A(rows, cols);
     for (int i=0; i < rows; i++){
         for (int j=0; j < cols; j++){
             A.arr[i][j] = arr[j][i];
@@ -304,7 +311,7 @@ Matrix<T> Matrix<T>::operator!(){
         cerr << "Determinant = 0\n";
         exit(1);
     }
-    Matrix A(rows, cols);
+    Matrix<double> A(rows, cols);
     if (!isCube()) {
         cerr << "Matrix must be square\n";
         exit(1);
@@ -317,4 +324,29 @@ Matrix<T> Matrix<T>::operator!(){
     A.transposed();
     A*(1/det);
     return A;
+}
+
+//перегрузка опреатора вывода матрицы в поток
+template<typename T>
+std::ostream &operator<<(std::ostream &os, const Matrix<T>& A) {
+    os << "Your Matrix: " << "\n";
+    for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+            os << A.arr[i][j] << " ";
+        }
+        os << '\n';
+    }
+    return os;
+}
+
+//перегрузка опреатора ввода матрицы в поток
+template<typename T>
+std::istream &operator>>(std::istream &is, Matrix<T>& A) {
+    for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+            printf("Enter element at position [%i][%i]\n", i+1, j+1);
+            is >> A.arr[i][j];
+        }
+    }
+    return is;
 }
